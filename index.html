@@ -1,0 +1,216 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
+<title>RGB色づくりクイズ rgbcolorQ</title>
+</head><body>
+
+<h1>RGB色づくりクイズ</h1>
+
+<main id="main">
+<div id="score">Q1</div>
+<div id="color2" class="color"></div>
+<div id="color1" class="color"></div>
+<div id="bars"></div>
+<!--
+<div id="rbar" class="bar"><div id="rbar2"></div></div>
+<div id="gbar" class="bar"></div>
+<div id="bbar" class="bar"></div>
+-->
+</main>
+
+<script type="module">
+//import { rnd } from "https://js.sabae.cc/rnd.js";
+import { RandomMT } from "./RandomMT.js";
+
+const seed = (new Date().getTime() / (1000 * 60)) >> 0;
+const r = new RandomMT(seed % 10000);
+const rnd = (n) => {
+	return r.getValue() % n;
+};
+
+const create = (tag) => document.createElement(tag);
+
+//const step = 1;
+const step = 2;
+
+const createBar = (id) => {
+	const range = create("input");
+	range.id = id;
+	range.setAttribute("type", "range");
+	range.setAttribute("min", 0);
+	range.setAttribute("max", 16 / step - 1);
+	range.setAttribute("value", 0);
+	range.className = "barrange";
+	return range;
+};
+const dec2hex = (n) => n.toString(16).toUpperCase();
+
+const getRandomColor3 = () => {
+	let s = "#";
+	for (let i = 0; i < 3; i++) {
+		s += dec2hex(rnd(8) * step);
+	}
+	return s;
+};
+
+let nq = 1;
+
+const game = () => {
+	const ans = getRandomColor3();
+	color1.textContent = "";
+	color1.style.background = ans;
+	color1.colans = ans;
+	color2.style.background = "#000";
+	color2.textContent = "#000";
+	for (let i = 0; i < 3; i++) {
+		const bar = createBar("bar" + i);
+		bar.style.backgroundColor = ["red", "green", "blue"][i];
+		bars.appendChild(bar);
+		bar.oninput = () => {
+			let c = "#";
+			let min = 15;
+			let sum = 0;
+			for (let i = 0; i < 3; i++) {
+				const n = document.getElementById("bar" + i).value * step;
+				c += dec2hex(n);
+				if (n < min) {
+					min = n;
+				}
+				sum += n;
+			}
+			color2.style.color = sum / 3 > 8 ? "black" : "white";
+			color2.textContent = c;
+			color2.style.background = c;
+			if (color1.colans == c) {
+				color1.textContent = "ok!";
+				setTimeout(() => {
+					const ans = getRandomColor3();
+					color1.textContent = "";
+					color1.style.background = ans;
+					color1.colans = ans;
+					score.textContent = "Q" + ++nq;
+				}, 1000);
+			}
+		};
+	}
+};
+game();
+</script>
+
+<hr>
+RGB色づくりクイズ<br>
+<br>
+光の三原色、赤、緑、青を混ぜて、右側の色をつくってみましょう。<br>
+#???というのが色を表し、赤、緑、青の順番で16進数でそれぞれの強さを指定します。<br>
+それぞれ8段階ですが、地味に難しい！<br>
+読み込み時の分で同じ問題が出題されます。友達と対戦してみよう！<br>
+<br>
+BaseApp: <a href="http://fukuno.jig.jp/2012/rgbcolor">2012年一日一創 rgbcolor</a><br>
+Lib: <a href=https://github.com/code4fukui/RandomMT/>RandomMT</a><br>
+<a href=https://github.com/code4fukui/rgbcolorQ/>src on GitHub</a><br>
+	
+<style>
+body {
+	text-align: center;
+	box-sizing: border-box;
+	overflow-x: hidden;
+	font-family: sans-serif;
+}
+#base {
+	display: inline-block;
+	border: 1px solid black;
+	padding: 30px;
+	background: #eee;
+	margin-top: 30px;
+}
+.color {
+	display: inline-block;
+	width: 140px;
+	height: 140px;
+	border: 2px solid black;
+	background: #fff;
+	line-height: 140px;
+	font-size: 20px;
+	color: #fff;
+	vertical-align: bottom;
+}
+.barrange {
+	display: inline-block;
+	x-width: 340px;
+}
+#bars {
+	x-width: 340px;
+	margin-top: 20px;
+}
+.bar {
+	display: inline-block;
+	width: 30px;
+	height: 160px;
+	border: 2px solid black;
+}
+#rbar {
+	background: #f00;
+}
+#rbar2 {
+	display: inline-block;
+	width: 30px;
+	height: 10px;
+	background: #ff0;
+	position: absolute;
+}
+#gbar {
+	background: #0f0;
+}
+#bbar {
+	background: #00f;
+}
+/*
+@media screen and (max-width: 500px) {
+	body {
+		zoom: 80%;
+	}
+}
+*/
+
+input[type=range] {
+  -webkit-appearance: none;
+	appearance: none;
+  cursor: pointer;
+	background: #8acdff;
+  height: 14px;
+  width: 90%;
+  border-radius: 10px;
+  border: solid 3px #dff1ff;
+  outline: 0; /* アウトラインを消して代わりにfocusのスタイルをあてる */
+  &:focus {
+    box-shadow: 0 0 3px rgb(0, 161, 255);
+  }
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+		background: #888; /* #53aeff; */
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.15);
+  }
+  &::-moz-range-thumb {
+    background: #53aeff;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    box-shadow: 0px 3px 6px 0px rgba(0, 0, 0, 0.15);
+    border: none;
+  }
+  &::-moz-focus-outer {
+    border: 0;
+  }
+  &:active::-webkit-slider-thumb {
+    box-shadow: 0px 5px 10px -2px rgba(0, 0, 0, 0.3);
+  }
+}
+#score {
+	font-size: 150%;
+	margin: .5em 0;
+}
+</style>
+
+</body>
+</html>
